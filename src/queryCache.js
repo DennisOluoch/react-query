@@ -1,3 +1,4 @@
+import React from 'react'
 import {
   isServer,
   functionalUpdate,
@@ -13,6 +14,42 @@ import {
 import { defaultConfigRef } from './config'
 
 export const queryCache = makeQueryCache()
+
+export const queryCacheContext = React.createContext(queryCache)
+
+export const queryCaches = [queryCache]
+
+export function useQueryCache() {
+  return React.useContext(queryCacheContext)
+}
+
+export function ReactQueryCacheProvider({ queryCache, children }) {
+  const cache = React.useMemo(() => queryCache || makeQueryCache(), [
+    queryCache,
+  ])
+
+  React.useEffect(() => {
+    queryCaches.push(cache)
+
+    return () => {
+      // remove the cache from the active list
+      const i = queryCaches.indexOf(cache)
+      if (i >= 0) {
+        queryCaches.splice(i, 1)
+      }
+      // if the cache was created by us, we need to tear it down
+      if (queryCache == null) {
+        cache.clear()
+      }
+    }
+  }, [cache, queryCache])
+
+  return (
+    <queryCacheContext.Provider value={cache}>
+      {children}
+    </queryCacheContext.Provider>
+  )
+}
 
 const actionInit = {}
 const actionFailed = {}
@@ -32,7 +69,7 @@ export function makeQueryCache() {
   }
 
   const notifyGlobalListeners = () => {
-    cache.isFetching = Object.values(queryCache.queries).reduce(
+    cache.isFetching = Object.values(cache.queries).reduce(
       (acc, query) => (query.state.isFetching ? acc + 1 : acc),
       0
     )
@@ -47,6 +84,7 @@ export function makeQueryCache() {
   }
 
   cache.clear = () => {
+    Object.values(cache.queries).forEach(query => query.clear())
     cache.queries = {}
     notifyGlobalListeners()
   }
@@ -76,6 +114,18 @@ export function makeQueryCache() {
     foundQueries.forEach(query => {
       clearTimeout(query.staleTimeout)
       delete cache.queries[query.queryHash]
+    })
+
+    if (foundQueries.length) {
+      notifyGlobalListeners()
+    }
+  }
+
+  cache.cancelQueries = (predicate, { exact } = {}) => {
+    const foundQueries = findQueries(predicate, { exact })
+
+    foundQueries.forEach(query => {
+      query.cancel()
     })
 
     if (foundQueries.length) {
@@ -113,6 +163,7 @@ export function makeQueryCache() {
       query.config = { ...query.config, ...config }
     } else {
       query = makeQuery({
+        cache,
         queryKey,
         queryHash,
         queryVariables,
@@ -196,6 +247,7 @@ export function makeQueryCache() {
   }
 
   function makeQuery(options) {
+    const queryCache = options.cache
     const reducer = options.config.queryReducer || defaultQueryReducer
 
     const noQueryHash = typeof options.queryHash === 'undefined'
@@ -272,6 +324,18 @@ export function makeQueryCache() {
       query.cancelled = null
     }
 
+    query.cancel = () => {
+      query.cancelled = cancelledError
+
+      if (query.cancelPromises) {
+        query.cancelPromises()
+      }
+
+      delete query.promise
+
+      notifyGlobalListeners()
+    }
+
     query.updateInstance = instance => {
       let found = query.instances.find(d => d.id === instance.id)
 
@@ -294,12 +358,7 @@ export function makeQueryCache() {
         query.instances = query.instances.filter(d => d.id !== instanceId)
 
         if (!query.instances.length) {
-          // Cancel any side-effects
-          query.cancelled = cancelledError
-
-          if (query.cancelQueries) {
-            query.cancelQueries()
-          }
+          query.cancel()
 
           // Schedule garbage collection
           query.scheduleGarbageCollection()
@@ -313,16 +372,16 @@ export function makeQueryCache() {
         // Perform the query
         const promise = queryFn(...query.config.queryFnParamsFilter(args))
 
-        query.cancelQueries = () => promise.cancel?.()
+        query.cancelPromises = () => promise.cancel?.()
 
         const data = await promise
 
-        delete query.cancelQueries
+        delete query.cancelPromises
         if (query.cancelled) throw query.cancelled
 
         return data
       } catch (error) {
-        delete query.cancelQueries
+        delete query.cancelPromises
         if (query.cancelled) throw query.cancelled
 
         // If we fail, increase the failureCount
@@ -385,6 +444,12 @@ export function makeQueryCache() {
           // If there are any retries pending for this query, kill them
           query.cancelled = null
 
+          const callbackInstances = [...query.instances]
+
+          if (query.wasSuspended) {
+            callbackInstances.unshift(query.suspenseInstance)
+          }
+
           try {
             // Set up the query refreshing state
             dispatch({ type: actionFetch })
@@ -400,12 +465,12 @@ export function makeQueryCache() {
               query.config.isDataEqual(old, data) ? old : data
             )
 
-            query.instances.forEach(
+            callbackInstances.forEach(
               instance =>
                 instance.onSuccess && instance.onSuccess(query.state.data)
             )
 
-            query.instances.forEach(
+            callbackInstances.forEach(
               instance =>
                 instance.onSettled && instance.onSettled(query.state.data, null)
             )
@@ -423,11 +488,11 @@ export function makeQueryCache() {
             delete query.promise
 
             if (error !== query.cancelled) {
-              query.instances.forEach(
+              callbackInstances.forEach(
                 instance => instance.onError && instance.onError(error)
               )
 
-              query.instances.forEach(
+              callbackInstances.forEach(
                 instance =>
                   instance.onSettled && instance.onSettled(undefined, error)
               )
@@ -450,6 +515,12 @@ export function makeQueryCache() {
       // Schedule a fresh invalidation!
       clearTimeout(query.staleTimeout)
       query.scheduleStaleTimeout()
+    }
+
+    query.clear = () => {
+      clearTimeout(query.staleTimeout)
+      clearTimeout(query.cacheTimeout)
+      query.cancel()
     }
 
     return query

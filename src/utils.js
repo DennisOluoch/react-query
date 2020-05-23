@@ -129,6 +129,9 @@ export function useMountedCallback(callback) {
 export function handleSuspense(queryInfo) {
   if (queryInfo.config.suspense || queryInfo.config.useErrorBoundary) {
     if (queryInfo.status === statusError) {
+      setTimeout(() => {
+        queryInfo.query.state.status = 'loading'
+      })
       throw queryInfo.error
     }
   }
@@ -155,6 +158,9 @@ export function deepEqual(a, b) {
       for (i = length; i-- !== 0; ) if (!deepEqual(a[i], b[i])) return false
       return true
     }
+
+    if (a.valueOf !== Object.prototype.valueOf)
+      return a.valueOf() === b.valueOf()
 
     keys = Object.keys(a)
     length = keys.length

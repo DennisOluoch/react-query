@@ -2,7 +2,7 @@ import React from 'react'
 
 //
 
-import { queryCache } from './queryCache'
+import { useQueryCache } from './queryCache'
 import { useConfigContext } from './config'
 import {
   useUid,
@@ -19,6 +19,8 @@ export function useBaseQuery(queryKey, queryVariables, queryFn, config = {}) {
     ...useConfigContext(),
     ...config,
   }
+
+  const queryCache = useQueryCache()
 
   const queryRef = React.useRef()
 
@@ -60,17 +62,23 @@ export function useBaseQuery(queryKey, queryVariables, queryFn, config = {}) {
     [query]
   )
 
-  // Create or update this instance of the query
-  query.updateInstance({
-    id: instanceId,
-    onStateUpdate: () => rerender({}),
+  query.suspenseInstance = {
     onSuccess: data => getLatestConfig().onSuccess(data),
     onError: err => getLatestConfig().onError(err),
     onSettled: (data, err) => getLatestConfig().onSettled(data, err),
-  })
+  }
 
   // After mount, subscribe to the query
   React.useEffect(() => {
+    // Update the instance to the query again, but not as a placeholder
+    query.updateInstance({
+      id: instanceId,
+      onStateUpdate: () => rerender({}),
+      onSuccess: data => getLatestConfig().onSuccess(data),
+      onError: err => getLatestConfig().onError(err),
+      onSettled: (data, err) => getLatestConfig().onSettled(data, err),
+    })
+
     return query.subscribe(instanceId)
   }, [getLatestConfig, instanceId, query, rerender])
 

@@ -400,6 +400,11 @@ export interface QueryOptions<TResult> extends BaseQueryOptions {
   initialData?: TResult | (() => TResult | undefined)
 }
 
+export interface PrefetchQueryOptions<TResult> extends QueryOptions<TResult> {
+  force?: boolean
+  throwOnError?: boolean
+}
+
 export interface InfiniteQueryOptions<TResult, TMoreVariable>
   extends QueryOptions<TResult[]> {
   getFetchMore: (
@@ -588,6 +593,7 @@ export interface CachedQuery<T> {
   setData(
     dataOrUpdater: unknown | ((oldData: unknown | undefined) => unknown)
   ): void
+  clear(): void
 }
 
 export interface QueryCache {
@@ -599,7 +605,7 @@ export interface QueryCache {
       | undefined
       | (() => TKey | false | null | undefined),
     queryFn: QueryFunction<TResult, TKey>,
-    config?: QueryOptions<TResult>
+    config?: PrefetchQueryOptions<TResult>
   ): Promise<TResult>
 
   prefetchQuery<TResult, TKey extends string>(
@@ -610,7 +616,7 @@ export interface QueryCache {
       | undefined
       | (() => TKey | false | null | undefined),
     queryFn: QueryFunction<TResult, [TKey]>,
-    config?: QueryOptions<TResult>
+    config?: PrefetchQueryOptions<TResult>
   ): Promise<TResult>
 
   prefetchQuery<
@@ -626,7 +632,7 @@ export interface QueryCache {
       | (() => TKey | false | null | undefined),
     variables: TVariables,
     queryFn: QueryFunctionWithVariables<TResult, TKey, TVariables>,
-    config?: QueryOptions<TResult>
+    config?: PrefetchQueryOptions<TResult>
   ): Promise<TResult>
 
   prefetchQuery<TResult, TKey extends string, TVariables extends AnyVariables>(
@@ -638,7 +644,7 @@ export interface QueryCache {
       | (() => TKey | false | null | undefined),
     variables: TVariables,
     queryFn: QueryFunctionWithVariables<TResult, [TKey], TVariables>,
-    config?: QueryOptions<TResult>
+    config?: PrefetchQueryOptions<TResult>
   ): Promise<TResult>
 
   prefetchQuery<
@@ -659,15 +665,15 @@ export interface QueryCache {
       | (() => TKey | false | null | undefined)
     variables?: TVariables
     queryFn: QueryFunctionWithVariables<TResult, TKey, TVariables>
-    config?: QueryOptions<TResult>
+    config?: PrefetchQueryOptions<TResult>
   }): Promise<TResult>
 
-  getQueryData(key: AnyQueryKey | string): unknown | undefined
-  setQueryData(
+  getQueryData<T = unknown>(key: AnyQueryKey | string): T | undefined
+  setQueryData<T = unknown>(
     key: AnyQueryKey | string,
-    dataOrUpdater: unknown | ((oldData: unknown | undefined) => unknown)
+    dataOrUpdater: T | ((oldData: T | undefined) => T)
   ): void
-  refetchQueries(
+  refetchQueries<TResult>(
     queryKeyOrPredicateFn:
       | AnyQueryKey
       | string
@@ -677,7 +683,7 @@ export interface QueryCache {
       throwOnError,
       force,
     }?: { exact?: boolean; throwOnError?: boolean; force?: boolean }
-  ): Promise<void>
+  ): Promise<TResult>
   removeQueries(
     queryKeyOrPredicateFn:
       | AnyQueryKey
@@ -687,12 +693,33 @@ export interface QueryCache {
   ): Promise<void>
   getQuery(queryKey: AnyQueryKey): CachedQuery<unknown> | undefined
   getQueries(queryKey: AnyQueryKey): Array<CachedQuery<unknown>>
+  cancelQueries(
+    queryKeyOrPredicateFn:
+      | AnyQueryKey
+      | string
+      | ((query: CachedQuery<unknown>) => boolean),
+    { exact }?: { exact?: boolean }
+  ): void
   isFetching: number
   subscribe(callback: (queryCache: QueryCache) => void): () => void
-  clear(): Array<CachedQuery<unknown>>
+  clear(): void
 }
 
 export const queryCache: QueryCache
+
+/**
+ * a factory that creates a new query cache
+ */
+export function makeQueryCache(): QueryCache
+
+/**
+ * A hook that uses the query cache context
+ */
+export function useQueryCache(): QueryCache
+
+export const ReactQueryCacheProvider: React.ComponentType<{
+  queryCache?: QueryCache
+}>
 
 /**
  * A hook that returns the number of the quiries that your application is loading or fetching in the background
@@ -738,3 +765,5 @@ export interface ConsoleObject {
 }
 
 export function setConsole(consoleObject: ConsoleObject): void
+
+export function deepIncludes(haystack: unknown, needle: unknown): boolean
