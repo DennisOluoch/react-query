@@ -2,6 +2,7 @@ import React from 'react'
 import axios from 'axios'
 
 import { useQuery, useMutation, queryCache } from 'react-query'
+import { ReactQueryDevtools } from 'react-query-devtools'
 
 export default () => {
   const [text, setText] = React.useState('')
@@ -17,6 +18,7 @@ export default () => {
       // the old value and return it so that it's accessible in case of
       // an error
       onMutate: text => {
+        setText('')
         queryCache.cancelQueries('todos')
 
         const previousValue = queryCache.getQueryData('todos')
@@ -31,11 +33,10 @@ export default () => {
       // On failure, roll back to the previous value
       onError: (err, variables, previousValue) =>
         queryCache.setQueryData('todos', previousValue),
-      onSuccess: () => {
-        setText('')
-      },
       // After success or failure, refetch the todos query
-      onSettled: () => queryCache.refetchQueries('todos'),
+      onSettled: () => {
+        queryCache.invalidateQueries('todos')
+      },
     }
   )
 
@@ -78,6 +79,7 @@ export default () => {
           <div>{isFetching ? 'Updating in background...' : ' '}</div>
         </>
       )}
+      <ReactQueryDevtools initialIsOpen />
     </div>
   )
 }

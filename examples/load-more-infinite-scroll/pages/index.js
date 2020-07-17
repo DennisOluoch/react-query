@@ -3,6 +3,7 @@ import Link from 'next/link'
 import axios from 'axios'
 
 import { useInfiniteQuery } from 'react-query'
+import { ReactQueryDevtools } from 'react-query-devtools'
 
 //
 
@@ -51,7 +52,7 @@ export default () => {
                   style={{
                     border: '1px solid gray',
                     borderRadius: '5px',
-                    padding: '5rem 1rem',
+                    padding: '10rem 1rem',
                   }}
                   key={project.id}
                 >
@@ -82,6 +83,7 @@ export default () => {
       <Link href="/about">
         <a>Go to another page</a>
       </Link>
+      <ReactQueryDevtools initialIsOpen />
     </div>
   )
 }

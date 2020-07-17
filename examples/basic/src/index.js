@@ -2,21 +2,8 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import axios from "axios";
-import { useQuery } from "react-query";
-
-const getPosts = async () => {
-  const { data } = await axios.get(
-    "https://jsonplaceholder.typicode.com/posts"
-  );
-  return data;
-};
-
-const getPostById = async (key, id) => {
-  const { data } = await axios.get(
-    `https://jsonplaceholder.typicode.com/posts/${id}`
-  );
-  return data;
-};
+import { useQuery, queryCache } from "react-query";
+import { ReactQueryDevtools } from "react-query-devtools";
 
 function App() {
   const [postId, setPostId] = React.useState(-1);
@@ -38,12 +25,22 @@ function App() {
       ) : (
         <Posts setPostId={setPostId} />
       )}
+      <ReactQueryDevtools initialIsOpen />
     </>
   );
 }
 
+function usePosts() {
+  return useQuery("posts", async () => {
+    const { data } = await axios.get(
+      "https://jsonplaceholder.typicode.com/posts"
+    );
+    return data;
+  });
+}
+
 function Posts({ setPostId }) {
-  const { status, data, error, isFetching } = useQuery("posts", getPosts);
+  const { status, data, error, isFetching } = usePosts();
 
   return (
     <div>
@@ -56,9 +53,22 @@ function Posts({ setPostId }) {
         ) : (
           <>
             <div>
-              {data.map(post => (
+              {data.map((post) => (
                 <p key={post.id}>
-                  <a onClick={() => setPostId(post.id)} href="#">
+                  <a
+                    onClick={() => setPostId(post.id)}
+                    href="#"
+                    style={
+                      // We can use the queryCache here to show bold links for
+                      // ones that are cached
+                      queryCache.getQueryData(["post", post.id])
+                        ? {
+                            fontWeight: "bold",
+                            color: "green",
+                          }
+                        : {}
+                    }
+                  >
                     {post.title}
                   </a>
                 </p>
@@ -72,11 +82,21 @@ function Posts({ setPostId }) {
   );
 }
 
-function Post({ postId, setPostId }) {
-  const { status, data, error, isFetching } = useQuery(
-    postId && ["post", postId],
-    getPostById
+const getPostById = async (key, id) => {
+  const { data } = await axios.get(
+    `https://jsonplaceholder.typicode.com/posts/${id}`
   );
+  return data;
+};
+
+function usePost(postId) {
+  return useQuery(["post", postId], getPostById, {
+    enabled: postId,
+  });
+}
+
+function Post({ postId, setPostId }) {
+  const { status, data, error, isFetching } = usePost(postId);
 
   return (
     <div>
