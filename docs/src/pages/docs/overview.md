@@ -3,7 +3,7 @@ id: overview
 title: Overview
 ---
 
-Simply put, React Query makes **fetching, caching, synchronizing and updating server state** in your React applications a breeze.
+React Query is often described as the missing data-fetching library for React, but in more technical terms, it makes **fetching, caching, synchronizing and updating server state** in your React applications a breeze.
 
 ## Motivation
 
@@ -25,6 +25,7 @@ Once you grasp the nature of server state in your application, **even more chall
 - Reflecting updates to data as quickly as possible
 - Performance optimizations like pagination and lazy loading data
 - Managing memory and garbage collection of server state
+- Memoizing query results with structural sharing
 
 If you're not overwhelmed by that list, then that must mean that you've probably solved all of your server state problems already and deserve an award. However, if you are like a vast majority of people, you either have yet to tackle all or most of these challenges and we're only scratching the surface!
 
@@ -46,9 +47,19 @@ In the example below, you can see React Query in its most basic and simple form 
 [Open in CodeSandbox](https://codesandbox.io/s/github/tannerlinsley/react-query/tree/master/examples/simple)
 
 ```js
-import { useQuery } from 'react-query'
+import { useQuery, QueryCache, ReactQueryCacheProvider } from 'react-query'
+
+const queryCache = new QueryCache()
 
 export default function App() {
+  return (
+    <ReactQueryCacheProvider queryCache={queryCache}>
+      <Example />
+    </ReactQueryCacheProvider>
+  )
+}
+
+function Example() {
   const { isLoading, error, data } = useQuery('repoData', () =>
     fetch('https://api.github.com/repos/tannerlinsley/react-query').then(res =>
       res.json()
@@ -70,3 +81,8 @@ export default function App() {
   )
 }
 ```
+
+## You talked me into it, so what now?
+
+- Consider taking the [React Query Essentials Course](https://learn.tanstack.com) (or buying it for your whole team!)
+- Learn React Query at your own pace with our amazingly thorough [guides](/docs/installation) and [API documentation](/docs/api)

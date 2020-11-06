@@ -9,7 +9,40 @@ import { ClientsMarquee } from 'components/clients/ClientsMarquee'
 import { Seo } from 'components/Seo'
 import Head from 'next/head'
 
-const Home = props => {
+const supporters = [
+  ['Kent C. Dodds', 'https://kentcdodds.com/'],
+  ['@bgazzera', 'https://github.com/bgazzera'],
+  ['Gabe Ragland', 'https://github.com/gragland'],
+  ['Matt Wood', 'https://github.com/mattwoodnyc'],
+  ['Joshua Turner', 'https://github.com/joshua-turner'],
+  ['Fillip Peyton', 'https://github.com/fillippeyton'],
+  ['Tim Myers', 'https://github.com/denvercoder'],
+  ['Andy Slezak', 'https://github.com/amslezak'],
+]
+
+const fans = [
+  `Steven Miyakawa (@SamSamskies)`,
+  `Alex Trost (@a-trost)`,
+  `Andrey (@andreyvital)`,
+  'Anoop (@Anoupz)',
+  'Daniel Almaguer (@deini)',
+  'Chris Vaszauskas (@chrisvasz)',
+  'Christian Rudh (@crudh)',
+  'Vianney Carel (@vcarel)',
+  'Freddie (@fdjones)',
+  'Johnny Bell (@johnnyxbell)',
+  'Garrett Fritz (@gfritzdev)',
+  'Juliano Farias (@frontendwizard)',
+  'Peter Pistorius (@peterp)',
+  'Agustín Villalobos (@agustin-v)',
+  'Panigo (@rangigo)',
+  'Jesse Jafa, (@awareness481)',
+  'Arijit Bhattacharya, (@hoodwink73)',
+  'Bryan Grill, (@brygrill)',
+  'Peter Hozák, (@Aprillion)',
+]
+
+const Home = () => {
   return (
     <>
       <Seo
@@ -129,6 +162,52 @@ const Home = props => {
             <ClientsMarquee />
           </div>
         </div>
+        <div className="bg-gray-900 text-white">
+          <div className="py-32">
+            <div className="mx-auto container text-center">
+              <div className="text-xl">ANNOUNCING</div>
+              <div className="text-3xl md:text-5xl font-bold">
+                React Query Essentials
+              </div>
+              <div className="text-xl italic">
+                The <strong>official</strong> React Query course by{' '}
+                <strong>Tanner Linsley</strong>
+              </div>
+              <a
+                href="https://learn.tanstack.com"
+                className="inline-block mt-8 rounded shadow-lg bg-coral text-white font-bold text-xl px-4 py-3"
+              >
+                ENROLL NOW
+              </a>
+              <div className="grid pt-8 text-white max-w-screen-lg mx-auto text-lg">
+                <a className="mb-2">
+                  <span className="bg-coral text-gray-800 w-4 h-4 mr-2 rounded-full inline-flex items-center justify-center">
+                    <Check />
+                  </span>
+                  50+ Lessons
+                </a>
+                <a className="mb-2">
+                  <span className="bg-coral text-gray-800 w-4 h-4 mr-2 rounded-full inline-flex items-center justify-center">
+                    <Check />
+                  </span>
+                  3+ Hours of Live-Code Training
+                </a>
+                <a className="mb-2">
+                  <span className="bg-coral text-gray-800 w-4 h-4 mr-2 rounded-full inline-flex items-center justify-center">
+                    <Check />
+                  </span>
+                  Lesson Source Code
+                </a>
+                <a className="mb-2">
+                  <span className="bg-coral text-gray-800 w-4 h-4 mr-2 rounded-full inline-flex items-center justify-center">
+                    <Check />
+                  </span>
+                  Full API coverage
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
         <div className="relative text-lg border-t border-gray-200 bg-white overflow-hidden">
           <div className="lg:block lg:absolute lg:inset-0">
             <svg
@@ -228,17 +307,11 @@ const Home = props => {
                   Supporters
                 </div>
                 <ul className="list-none text-center">
-                  <li className="font-bold text-blue-800">
-                    <a href="https://kentcdodds.com/">
-                      Kent C. Dodds (kentcdodds.com)
-                    </a>
-                  </li>
-                  <li className="font-bold text-blue-800">
-                    <a href="https://github.com/bgazzera">@bgazzera</a>
-                  </li>
-                  <li className="font-bold text-blue-800">
-                    <a href="https://github.com/gragland">Gabe Ragland</a>
-                  </li>
+                  {supporters.map((supporter, i) => (
+                    <li className="font-bold text-blue-800" key={i}>
+                      <a href={supporter[1]}>{supporter[0]}</a>
+                    </li>
+                  ))}
                 </ul>
               </div>
 
@@ -247,7 +320,9 @@ const Home = props => {
                   Fans
                 </div>
                 <ul className="list-none text-center">
-                  <li>Steven Miyakawa (@SamSamskies)</li>
+                  {fans.map(fan => (
+                    <li key={fan}>{fan}</li>
+                  ))}
                 </ul>
               </div>
             </div>

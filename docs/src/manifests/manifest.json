@@ -37,11 +37,26 @@
               "title": "Comparison",
               "path": "/docs/comparison",
               "editUrl": "/docs/comparison.md"
+            },
+            {
+              "title": "TypeScript",
+              "path": "/docs/typescript",
+              "editUrl": "/docs/typescript.md"
+            },
+            {
+              "title": "GraphQL",
+              "path": "/docs/graphql",
+              "editUrl": "/docs/graphql.md"
+            },
+            {
+              "title": "React Native",
+              "path": "/docs/react-native",
+              "editUrl": "/docs/react-native.md"
             }
           ]
         },
         {
-          "title": "Concepts",
+          "title": "Guides & Concepts",
           "open": true,
           "routes": [
             {
@@ -143,8 +158,24 @@
               "title": "Suspense",
               "path": "/docs/guides/suspense",
               "editUrl": "/docs/guides/suspense.md"
+            },
+            {
+              "title": "Testing",
+              "path": "/docs/guides/testing",
+              "editUrl": "/docs/guides/testing.md"
+            },
+            {
+              "title": "Does this replace [Redux, MobX, etc]?",
+              "path": "/docs/guides/does-this-replace-client-state",
+              "editUrl": "/docs/guides/does-this-replace-client-state.md"
             }
           ]
+        },
+        {
+          "title": "API Reference",
+          "heading": true,
+          "path": "/docs/api",
+          "editUrl": "/docs/api.md"
         },
         {
           "title": "Examples",
@@ -159,6 +190,11 @@
               "title": "Basic",
               "path": "/docs/examples/basic",
               "editUrl": "/docs/examples/basic.mdx"
+            },
+            {
+              "title": "Basic w/ GraphQL-Request",
+              "path": "/docs/examples/basic-graphql-request",
+              "editUrl": "/docs/examples/basic-graphql-request.mdx"
             },
             {
               "title": "Custom Hooks",
@@ -223,12 +259,6 @@
           ]
         }
       ]
-    },
-    {
-      "title": "API Reference",
-      "heading": true,
-      "path": "/docs/api",
-      "editUrl": "/docs/api.md"
     }
   ]
 }

@@ -2,6 +2,7 @@ import React from 'react'
 import '@docsearch/react/dist/style.css'
 import '../styles/index.css'
 import Head from 'next/head'
+import { SearchProvider } from 'components/useSearch'
 
 function loadScript(src, attrs = {}) {
   if (typeof document !== 'undefined') {
@@ -46,7 +47,11 @@ function MyApp({ Component, pageProps }) {
           }}
         />
       </Head>
-      <Component {...pageProps} />
+      {/* eslint-disable-next-line jsx-a11y/alt-text */}
+      <img src="https://static.scarf.sh/a.png?x-pxid=c03d3ddd-b47e-4e26-a9b2-9df68b2ac970" />
+      <SearchProvider>
+        <Component {...pageProps} />
+      </SearchProvider>
     </>
   )
 }

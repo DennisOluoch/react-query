@@ -5,7 +5,7 @@ title: Queries
 
 ## Query Basics
 
-In React Query, a query is a declarative dependency on some asynchronous source of data.
+In React Query, a query is a declarative dependency on some asynchronous source of data. A query can be used with any Promise based method (including GET and POST methods) to fetch data from a server. If your method modifies data on the server, we recommend using [Mutations](https://react-query.tanstack.com/docs/guides/mutations) instead.
 
 To make a new query, call the `useQuery` hook with at least:
 
@@ -109,7 +109,7 @@ useQuery(['todo', 5], ...)
 
 // And individual todo in a "preview" format
 useQuery(['todo', 5, { preview: true }], ...)
-// queryKey === ['todo', 5, { preview: 'true' } }]
+// queryKey === ['todo', 5, { preview: true }]
 
 // A list of todos that are "done"
 useQuery(['todos', { type: 'done' }], ...)
@@ -200,7 +200,7 @@ const { data: user } = useQuery(['user', email], getUserByEmail)
 
 // Then get the user's projects
 const { isIdle, data: projects } = useQuery(
-  ['projects', user.id],
+  ['projects', user?.id],
   getProjectsByUser,
   {
     // `user` would be `null` at first (falsy),

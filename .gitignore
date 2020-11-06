@@ -7,6 +7,8 @@ node_modules
 # builds
 build
 dist
+lib
+es
 artifacts
 .rpt2_cache
 coverage
@@ -25,5 +27,9 @@ yarn-debug.log*
 yarn-error.log*
 .history
 size-plugin.json
+stats-hydration.json
+stats-react.json
 stats.html
 .vscode/settings.json
+
+types
