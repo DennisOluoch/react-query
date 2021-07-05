@@ -28,6 +28,7 @@ Enjoy this library? Try the entire [TanStack](https://tanstack.com)! [React Tabl
 
 ## Visit [react-query.tanstack.com](https://react-query.tanstack.com) for docs, guides, API and more!
 
+Still on **React Query v2**? No problem! Check out the v2 docs here: https://react-query-v2.tanstack.com/.
 ## Quick Features
 
 - Transport/protocol/backend agnostic data fetching (REST, GraphQL, promises, whatever!)
@@ -39,7 +40,7 @@ Enjoy this library? Try the entire [TanStack](https://tanstack.com)! [React Tabl
 - Load-More + Infinite Scroll Queries w/ Scroll Recovery
 - Request Cancellation
 - [React Suspense](https://reactjs.org/docs/concurrent-mode-suspense.html) + Fetch-As-You-Render Query Prefetching
-- [Dedicated Devtools (React Query Devtools)](https://github.com/tannerlinsley/react-query-devtools)
+- Dedicated Devtools
 - <a href="https://bundlephobia.com/result?p=react-query@latest" target="\_parent">
   <img alt="" src="https://badgen.net/bundlephobia/minzip/react-query@latest" />
   </a> (depending on features imported)
@@ -80,4 +81,4 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
 
-<!-- Force 1 -->
+<!-- Force 3 -->

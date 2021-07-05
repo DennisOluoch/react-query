@@ -125,7 +125,7 @@
   @apply p-3;
 }
 
-.markdown > :not(pre):not(h3) > code,
+.markdown > :not(pre) code,
 .markdown > ul > li > code,
 .markdown > blockquote > code,
 .markdown > blockquote > p > code,
@@ -154,6 +154,12 @@
 
 .markdown > h2 > code {
   @apply text-xl;
+}
+
+.markdown > h2 > a,
+.markdown > h3 > a,
+.markdown > h4 > a {
+  @apply underline;
 }
 
 .markdown > .markdown ul {

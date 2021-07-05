@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
 import { usePosts } from '../../hooks/usePosts'
 
-export const PostList = ({ isClient }) => {
+export const PostList = () => {
   const [postCount, setPostCount] = useState(10)
-  const { data, isFetching } = usePosts(postCount, isClient)
-  if (isFetching) return <div>Loading</div>
+  const { data, isLoading, isFetching } = usePosts(postCount)
+
+  if (isLoading) return <div>Loading</div>
 
   return (
     <section>

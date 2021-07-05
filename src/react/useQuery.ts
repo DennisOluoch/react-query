@@ -1,54 +1,50 @@
-import {
-  QueryConfig,
-  QueryFunction,
-  QueryKey,
-  QueryResult,
-  TypedQueryFunction,
-  TypedQueryFunctionArgs,
-} from '../core/types'
-import { getQueryArgs } from '../core/utils'
+import { QueryObserver } from '../core'
+import { QueryFunction, QueryKey } from '../core/types'
+import { parseQueryArgs } from '../core/utils'
+import { UseQueryOptions, UseQueryResult } from './types'
 import { useBaseQuery } from './useBaseQuery'
-
-// TYPES
-
-export interface UseQueryObjectConfig<TResult, TError> {
-  queryKey: QueryKey
-  queryFn?: QueryFunction<TResult>
-  config?: QueryConfig<TResult, TError>
-}
 
 // HOOK
 
-// Parameter syntax with optional config
-export function useQuery<TResult = unknown, TError = unknown>(
-  queryKey: QueryKey,
-  queryConfig?: QueryConfig<TResult, TError>
-): QueryResult<TResult, TError>
-
-// Parameter syntax with query function and optional config
-export function useQuery<TResult, TError, TArgs extends TypedQueryFunctionArgs>(
-  queryKey: QueryKey,
-  queryFn: TypedQueryFunction<TResult, TArgs>,
-  queryConfig?: QueryConfig<TResult, TError>
-): QueryResult<TResult, TError>
-
-export function useQuery<TResult = unknown, TError = unknown>(
-  queryKey: QueryKey,
-  queryFn: QueryFunction<TResult>,
-  queryConfig?: QueryConfig<TResult, TError>
-): QueryResult<TResult, TError>
-
-// Object syntax
-export function useQuery<TResult = unknown, TError = unknown>(
-  config: UseQueryObjectConfig<TResult, TError>
-): QueryResult<TResult, TError>
-
-// Implementation
-export function useQuery<TResult, TError>(
-  arg1: any,
-  arg2?: any,
-  arg3?: any
-): QueryResult<TResult, TError> {
-  const [queryKey, config] = getQueryArgs<TResult, TError>(arg1, arg2, arg3)
-  return useBaseQuery(queryKey, config)
+export function useQuery<
+  TQueryFnData = unknown,
+  TError = unknown,
+  TData = TQueryFnData,
+  TQueryKey extends QueryKey = QueryKey
+>(
+  options: UseQueryOptions<TQueryFnData, TError, TData, TQueryKey>
+): UseQueryResult<TData, TError>
+export function useQuery<
+  TQueryFnData = unknown,
+  TError = unknown,
+  TData = TQueryFnData,
+  TQueryKey extends QueryKey = QueryKey
+>(
+  queryKey: TQueryKey,
+  options?: UseQueryOptions<TQueryFnData, TError, TData, TQueryKey>
+): UseQueryResult<TData, TError>
+export function useQuery<
+  TQueryFnData = unknown,
+  TError = unknown,
+  TData = TQueryFnData,
+  TQueryKey extends QueryKey = QueryKey
+>(
+  queryKey: TQueryKey,
+  queryFn: QueryFunction<TQueryFnData, TQueryKey>,
+  options?: UseQueryOptions<TQueryFnData, TError, TData, TQueryKey>
+): UseQueryResult<TData, TError>
+export function useQuery<
+  TQueryFnData,
+  TError,
+  TData = TQueryFnData,
+  TQueryKey extends QueryKey = QueryKey
+>(
+  arg1: TQueryKey | UseQueryOptions<TQueryFnData, TError, TData, TQueryKey>,
+  arg2?:
+    | QueryFunction<TQueryFnData, TQueryKey>
+    | UseQueryOptions<TQueryFnData, TError, TData, TQueryKey>,
+  arg3?: UseQueryOptions<TQueryFnData, TError, TData, TQueryKey>
+): UseQueryResult<TData, TError> {
+  const parsedOptions = parseQueryArgs(arg1, arg2, arg3)
+  return useBaseQuery(parsedOptions, QueryObserver)
 }
